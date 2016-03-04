@@ -3,6 +3,7 @@ package entities;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -105,8 +106,8 @@ public class MovingState implements EntityState{
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		p.paint(g);
+	public void paint(Graphics g, BufferedImage img) {
+		p.paint(g, img);
 		
 	}
 

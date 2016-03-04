@@ -2,6 +2,7 @@ package entities;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
 import interfaces.Direction;
 import interfaces.Entity;
@@ -23,8 +24,8 @@ public class IdleState implements EntityState{
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		p.paint(g);
+	public void paint(Graphics g, BufferedImage img) {
+		p.paint(g, img);
 		
 	}
 

@@ -2,6 +2,7 @@ package interfaces;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import entities.IdleState;
 import io.KeyboardInput;
@@ -18,6 +19,8 @@ public class Entity {
 	protected int y;			//vertical location of the player
 	protected Level l;
 	protected EntityState state;
+	protected int imgX;
+	protected int imgY;
 	
 
 	public Entity(int x, int y, Level l) {
@@ -55,11 +58,14 @@ public class Entity {
 		return l;
 	}
 	
-	public void paint(Graphics g) {
-		g.setColor(this.getColor());
-		g.fillOval(this.x * Level.TILE_SIZE, this.y * Level.TILE_SIZE, Level.TILE_SIZE, Level.TILE_SIZE);
+	//default paint method.
+	//takes a graphics object, and an image containing the tileset.
+	//also takes x/y coordinates of where the tile's top left corner shoudl be drawn.
+	//uses default tile_size from Level class
+	public void paint(Graphics g, BufferedImage img) {
+		g.drawImage(img,  x * Level.TILE_SIZE, y * Level.TILE_SIZE, x * Level.TILE_SIZE + Level.TILE_SIZE, y * Level.TILE_SIZE + Level.TILE_SIZE, imgX, imgY, imgX + 16, imgY + 16, null);
 	}
-	
+
 	protected Color getColor() {
 		return Color.GREEN;
 	}
@@ -69,7 +75,14 @@ public class Entity {
 	}
 
 	public void update() {
-		this.state.update();
-		
+		this.state.update();		
+	}
+	
+	protected void setImgX(int imgX) {
+		this.imgX = imgX;
+	}
+	
+	protected void setImgY(int imgY) {
+		this.imgY = imgY;
 	}
 }

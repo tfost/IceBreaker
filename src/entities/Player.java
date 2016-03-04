@@ -27,7 +27,6 @@ public class Player extends Entity {
 	}
 	
 	
-	
 	public Level getLevel() {
 		return l;
 	}

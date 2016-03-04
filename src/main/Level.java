@@ -99,7 +99,7 @@ public class Level {
 	 * constructs a new level based off the default test level.
 	 */
 	public Level() {
-		this(testLevel2);
+		this(testLevel4);
 	}
 	
 	/**
@@ -214,7 +214,7 @@ public class Level {
 		for (int i = 0; i < this.entities.length; i++) {
 			for (int j = 0; j < this.entities[0].length; j++) {
 				if (this.entities[i][j] != null) {
-					this.entities[i][j].paint(g);
+					this.entities[i][j].paint(g, img);
 				}
 				
 			}

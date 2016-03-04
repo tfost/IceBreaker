@@ -9,14 +9,18 @@ public class WeightedButton extends Button{
 	public WeightedButton() {
 		super();
 		pressed = false;
+		this.setImgX(80);
+		this.setImgY(16);
 	}
 	
 	public void onMoveInto() {
 		pressed = true;
+		this.setImgX(96);
 	}
 	
 	public void onExit() {
 		pressed = false;
+		this.setImgX(80);
 	}
 	
 	public Color getColor() {
@@ -32,6 +36,8 @@ public class WeightedButton extends Button{
 	}
 	
 	public void reset() {
-		pressed = false;;
+		pressed = false;
+		this.setImgX(80);
+		this.setImgY(16);
 	}
 }

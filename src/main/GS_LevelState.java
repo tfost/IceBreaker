@@ -57,7 +57,7 @@ public class GS_LevelState extends GameState{
 	@Override
 	public void paint(Graphics g) {
 		this.level.paint(g, img);	
-		this.player.paint(g);
+		this.player.paint(g, img);
 	}
 
 	@Override

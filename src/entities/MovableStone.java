@@ -10,7 +10,11 @@ public class MovableStone extends Entity {
 	public MovableStone(int x, int y, Level l) {
 		super(x, y, l);
 		brown = new Color(139,69,19);
+		this.setImgX(64);
+		this.setImgY(32);
 	}
+	
+	
 	
 	public Color getColor() {
 		return brown;
