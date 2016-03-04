@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import entities.Player;
 import interfaces.Entity;
@@ -14,13 +19,19 @@ public class GS_LevelState extends GameState{
 
 	private Level level;
 	private Entity player;
-	
+	private BufferedImage img;
 	
 	public GS_LevelState(KeyboardInput input) {
 		super(input);
 		this.level = new Level(); //DEBUG - use default level.
 		Point p = this.level.getStartingPointCoords();
 		this.player = level.getEntity(p.x, p.y);
+		this.img = null;
+		try {
+			img = ImageIO.read(getClass().getResource("/tileset.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	
@@ -45,7 +56,7 @@ public class GS_LevelState extends GameState{
 	
 	@Override
 	public void paint(Graphics g) {
-		this.level.paint(g);	
+		this.level.paint(g, img);	
 		this.player.paint(g);
 	}
 

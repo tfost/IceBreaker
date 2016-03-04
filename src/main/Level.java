@@ -3,6 +3,7 @@ package main;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,9 +42,9 @@ public class Level {
 			{1,3,1,1,1,1,1,1,1,1,1,1,1},
 			{1,0,0,0,0,0,0,0,0,0,0,0,1},
 			{1,0,0,1,1,1,1,0,1,1,0,0,1},
-			{1,5,1,0,3,0,0,3,0,3,1,0,1},
-			{1,5,1,0,1,1,1,3,1,3,1,0,1},
-			{1,5,1,0,0,3,0,3,3,3,1,0,1},
+			{1,0,1,0,3,0,0,3,0,3,1,0,1},
+			{1,0,1,0,1,1,1,3,1,3,1,0,1},
+			{1,0,1,0,0,3,0,3,3,3,1,0,1},
 			{1,0,0,0,3,1,1,3,0,1,0,0,1},
 			{1,2,0,0,3,3,3,3,0,0,0,0,1},
 			{1,1,1,1,1,1,1,1,1,1,1,1,1}
@@ -98,7 +99,7 @@ public class Level {
 	 * constructs a new level based off the default test level.
 	 */
 	public Level() {
-		this(testLevel5);
+		this(testLevel2);
 	}
 	
 	/**
@@ -200,12 +201,13 @@ public class Level {
 	}
 	
 	//paint each tile to the screen. 
-	public void paint(Graphics g) {
+	public void paint(Graphics g, BufferedImage img) {
 		for (int i = 0; i < this.data.length; i++) {
 			for (int j = 0; j < this.data[0].length; j++) {
 				Tile t = this.data[i][j];
-				g.setColor(t.getColor());
-				g.fillRect(j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				//g.setColor(t.getColor());
+				t.paint(g, img, j, i);
+				//g.fillRect(j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 				
 			}
 		}

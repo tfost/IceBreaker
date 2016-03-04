@@ -14,11 +14,24 @@ public class PressOnlyOnceButton extends Button {
 	
 	protected int presses;
 	
-	public void onMoveInto() {
-		this.presses++;
+	public PressOnlyOnceButton() {
+		super();
+		this.setImgX(80);
+		this.setImgY(0);
 	}
 	
-	public Color getColor() {
+	public void onMoveInto() {
+		this.presses++;
+		if (presses == 0) {
+			
+		} else if (presses == 1) {
+			this.setImgX(96);
+		} else {
+			this.setImgX(112);
+		}
+	}
+	
+	/*public Color getColor() {
 		if (presses == 0) {
 			return Color.yellow;
 		} else if (presses == 1) {
@@ -26,7 +39,7 @@ public class PressOnlyOnceButton extends Button {
 		} else {
 			return Color.RED;
 		}
-	}
+	}*/
 	
 	public boolean isValid() {
 		return this.presses == 1;
@@ -34,5 +47,7 @@ public class PressOnlyOnceButton extends Button {
 	
 	public void reset() {
 		this.presses = 0;
+		this.setImgX(80);
+		this.setImgY(0);
 	}
 }
