@@ -20,6 +20,8 @@ public class Player extends Entity {
 	public Player(int x, int y, Level l) {
 		super(x, y, l);
 		this.state = new IdleState(this);
+		this.setImgX(0);
+		this.setImgY(32);
 	}
 	
 	public void handleInput(KeyboardInput input) {

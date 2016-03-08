@@ -14,7 +14,7 @@ import io.KeyboardInput;
 import main.Level;
 import tiles.Tile;
 
-//allows support for frictionless tiles.
+//TODO - generate moves after each delay, so that we only push stones and the like immediately after we move into them
 public class MovingState implements EntityState{
 
 	private Entity p;
@@ -67,7 +67,7 @@ public class MovingState implements EntityState{
 				Tile t = p.getLevel().getTile(x + newDx, y + newDy);
 				if (t.canMoveInto()) {					
 					if (level.getEntity(x + newDx, y + newDy) != null) {//there's something where we're tryign to move!
-						if (level.getTile(x + newDx + newDx, y + newDy + newDy).canMoveInto() && level.getEntity(x + newDx + newDx, y + newDy + newDy) == null) {//next spot is empty
+						if (level.getTile(x + newDx + dx, y + newDy + dy).canMoveInto() && level.getEntity(x + newDx + dx, y + newDy + dy) == null) {//next spot is empty
 							level.getEntity(x + newDx, y + newDy).setState(new MovingState(level.getEntity(x + newDx, y + newDy), dir));
 							path.add(new Point(x + newDx, y + newDy));
 						}

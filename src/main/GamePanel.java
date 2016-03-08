@@ -14,8 +14,6 @@ import javax.swing.JFrame;
 import io.KeyboardInput;
 import interfaces.GameState;
 
-//art from http://opengameart.org/content/a-blocky-dungeon
-
 public class GamePanel extends JPanel{
 	
 	public static final int WIDTH = 512;
