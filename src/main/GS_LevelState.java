@@ -7,10 +7,14 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import display.Camera;
 import entities.Player;
+import generators.WorldBuilder;
 import interfaces.Entity;
 import interfaces.GameState;
 import io.KeyboardInput;
@@ -20,12 +24,24 @@ public class GS_LevelState extends GameState{
 	private Level level;
 	private Entity player;
 	private BufferedImage img;
+	private Set<Entity> nonPlayerEntities;
+	private Camera c;
+	private int turnNum;
 	
+	// Creates a levelstate.
 	public GS_LevelState(KeyboardInput input) {
 		super(input);
-		this.level = new Level(); //DEBUG - use default level.
+		WorldBuilder builder = new WorldBuilder();
+		builder.populate();
+		//this.level = new Level(builder.toCharArray()); 
+		//DEBUG:
+		this.level = new Level();
 		Point p = this.level.getStartingPointCoords();
 		this.player = level.getEntity(p.x, p.y);
+		c = new Camera((Player) this.player);
+		this.turnNum = 1;
+		
+		this.nonPlayerEntities = level.getNonPlayerEntities();
 		this.img = null;
 		try {
 			img = ImageIO.read(getClass().getResource("/tileset.png"));
@@ -33,31 +49,57 @@ public class GS_LevelState extends GameState{
 			e.printStackTrace();
 		}
 	}
-
+	
+	/*
+	 * Basic level flow:
+	 * 		Increment turn counter
+	 *		Wait for player to determine their action
+	 *		execute player action
+	 *		go through loop of all characters, to determine what their action will be
+	 *			should enemy attack, do one after another.
+	 *			should enemy move, decide where to move, move entity in world, but then display entity moving over time.
+	 */
 	
 	@Override
 	public void update() {
+		
 		keyboard.poll();
-		if (keyboard.keyDown(KeyEvent.VK_X)) {
-			this.reset();
-		}
-		player.handleInput(keyboard);
-		player.update();
-		for (Entity e : level.getNonPlayerEntities()) {
-			e.update();
+		if (player.inTurn()) {
+			player.handleInput(keyboard);
+			player.update();
+			//If the player just completed their turn.
+			if (!player.inTurn()) {
+				for (Entity e : this.nonPlayerEntities) {
+					e.onTurnStart(this.turnNum);
+				}
+			}
+		} else { //at least 1 entity in the nonplayerentities is in their turn.
+			for (Entity e : this.nonPlayerEntities) {
+				e.update(); 
+			}
+			if (!entitiesInTurn()) { //time for the player to go!
+				this.turnNum++;
+				player.onTurnStart(this.turnNum);
+			}
 		}
 	}
 	
-	private void reset() {
-		this.level.reset();
-		this.player = new Player(this.level.getStartingPointCoords().x, this.level.getStartingPointCoords().y, this.level);
-
+	private boolean entitiesInTurn() {
+		for (Entity e : this.nonPlayerEntities) {
+			if (e.inTurn()) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
 	public void paint(Graphics g) {
-		this.level.paint(g, img);	
-		this.player.paint(g, img);
+		this.level.paint(g, img, c);	
+		this.player.paint(g, img, c);
+		for (Entity e : this.nonPlayerEntities) {
+			e.paint(g, img, c);
+		}
 	}
 
 	@Override

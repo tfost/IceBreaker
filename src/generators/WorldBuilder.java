@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
@@ -14,12 +16,12 @@ public class WorldBuilder {
 	private BoardObject[][] world;
 	private int minRoomSize = 5;
 	private int maxRoomSize = 11;
-	private int width = 111;
-	private int height = 107;
+	private int width = 51;
+	private int height = 51;
 	private Random rand;
 	
 	
-	public static final int NUM_ATTEMPTS = 200;
+	public static final int NUM_ATTEMPTS = 20000;
 	
 	public WorldBuilder() {
 		world = new BoardObject[height][width];
@@ -29,6 +31,7 @@ public class WorldBuilder {
 				world[y][x] = new BoardObject('@');
 			}
 		}
+		
 	}
 	/*
 	 * H >> 1 2 3 4 5 6
@@ -61,15 +64,83 @@ public class WorldBuilder {
 	
 	
 	public void populate() {		
-		this.placeRooms();	//place random non-overlapping rooms
+		List<Point> points = this.placeRooms();	//place random non-overlapping rooms
 
 		this.placeMazes();	//fill in remaining solid regions with mazes
 		this.connectMaze();//connect mazes with rooms, with chances for extra connections.
-		//System.out.println(this);
 		this.sparsify();//remove dead ends from the dungeon.
 		System.out.println(this);
 
+		this.placeEntranceAndExit(points);
+		System.out.println(this);
+
+
 	}	
+	
+	private void placeEntranceAndExit(List<Point> points) {
+		//entrance = "E" exit = "X"
+		int p1 = rand.nextInt(points.size());
+		int p2 = rand.nextInt(points.size());
+		Point source = points.get(p1);
+		Point dest = points.get(p2);
+		//if they are the same point, or there is no path between the two, give up.
+		while (p1 == p2 || world[source.y][source.x].roomNum == -1 || world[dest.y][dest.x].roomNum == -1 || !pathExists(dest, source)) {
+			//points.remove(p1);
+			//points.remove(p2); //one of these is in an unreachable area, so remove both for safety.
+			p1 = rand.nextInt(points.size());
+			p2 = rand.nextInt(points.size());
+			source = points.get(p1);
+			dest = points.get(p2);
+		}
+		world[points.get(p1).y][points.get(p1).x].c = 'E';
+		world[points.get(p2).y][points.get(p2).x].c = 'X';
+
+	}
+	
+	//this class performs a bfs to see if a path exists between 2 points.
+	private boolean pathExists(Point dest, Point source) {
+		if (inBounds(dest) && inBounds(source)) {
+			this.markAllUnvisited();
+			world[source.y][source.x].markVisited();
+			Queue<Point> q = new LinkedList<>();
+			q.add(source);
+			while(!q.isEmpty()) {
+				Point p = q.remove();
+				if (inBounds(p)) {
+					Set<Point> neighbors = getNeighbors(p);
+					for (Point next : neighbors) {
+						if (next.equals(dest)) {
+							return true;
+						} else if (!world[next.y][next.x].visited && world[next.y][next.x].isOpen()) {
+							world[next.y][next.x].markVisited();
+							q.add(next);
+						}
+					}
+				}
+			}
+		}
+			return false;
+	}
+	
+	private Set<Point> getNeighbors(Point p) {
+		int x = p.x;
+		int y = p.y;
+		Set<Point> res = new HashSet<Point>();
+		res.add(new Point(x - 1, y));
+		res.add(new Point(x + 1, y));
+		res.add(new Point(x, y - 1));
+		res.add(new Point(x, y + 1));
+		return res;
+	}
+	
+	
+	private void markAllUnvisited() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				world[y][x].visited = false;
+			}
+		}
+	}
 	
 	private void sparsify() {
 		for (int y = 1; y < height - 1; y++) {
@@ -236,14 +307,17 @@ public class WorldBuilder {
 	
 	}
 	
-	private void placeRooms() {
+	//returns a list containing all values that are considered valid tiles in a room.
+	private List<Point> placeRooms() {
+		List<Point> points = new ArrayList<>();
 		for (int i = 0; i < NUM_ATTEMPTS; i++) {
 			int x = rand.nextInt(width);
 			int y = rand.nextInt(height);
 			int roomWidth = rand.nextInt(this.minRoomSize) + (this.maxRoomSize - this.minRoomSize);
 			int roomHeight = rand.nextInt(this.minRoomSize) + (this.maxRoomSize - this.minRoomSize);
-			attemptRoomPlace(x, y, roomWidth, roomHeight, i);
+			attemptRoomPlace(x, y, roomWidth, roomHeight, i, points);
 		}
+		return points;
 	}
 	
 	/*How we will treat the array:
@@ -256,7 +330,7 @@ public class WorldBuilder {
 	 * 
 	 */
 	
-	private boolean attemptRoomPlace(int x, int y, int roomWidth, int roomHeight, int attempt) {
+	private boolean attemptRoomPlace(int x, int y, int roomWidth, int roomHeight, int attempt, List<Point> points) {
 		for (int h = y; h < roomHeight + y; h++) {
 			for (int w = x; w < roomWidth + x; w++) {
 				if (!checkValidSpot(w, h, false)) {
@@ -264,10 +338,11 @@ public class WorldBuilder {
 				}
 			}
 		}
-		//at this point,its safe to place a room.
+		//at this point,its safe to place a room. add all points into the list, as they are safe locations.
 		for (int h = y; h < roomHeight + y; h++) {
 			for (int w = x; w < roomWidth + x; w++) {
 				world[h][w].makeRoom(attempt);
+				points.add(new Point(h, w));
 			}
 		}
 		return true;

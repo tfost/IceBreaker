@@ -16,8 +16,8 @@ import interfaces.GameState;
 
 public class GamePanel extends JPanel{
 	
-	public static final int WIDTH = 512;
-	public static final int HEIGHT = 512;
+	public static final int WIDTH = 900;
+	public static final int HEIGHT = 900;
 	
 	public KeyboardInput keyboard;	
 	public GamePanel panel;
@@ -27,6 +27,7 @@ public class GamePanel extends JPanel{
 		this.keyboard = new KeyboardInput();
 		this.addKeyListener(keyboard);
 		this.stateStack = new Stack<>();
+		
 		//push initial state.
 		this.stateStack.push(new GS_TitleScreen(keyboard));
 		JFrame frame = new JFrame("Prototype");

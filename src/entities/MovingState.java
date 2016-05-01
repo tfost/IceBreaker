@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import display.Camera;
 import interfaces.Direction;
 import interfaces.Entity;
 import interfaces.EntityState;
@@ -48,7 +49,12 @@ public class MovingState implements EntityState{
 		}
 		int x = p.getX();
 		int y = p.getY();
-		Tile init = p.getLevel().getTile(x + dx, y + dy);
+		if (p.getLevel().canMoveInto(x + dx, y + dy)) {
+			path.add(new Point(x + dx, y + dy));
+		} else {
+			path = null;
+		}
+		/*Tile init = p.getLevel().getTile(x + dx, y + dy);
 		Level level = p.getLevel();
 		if (init.canMoveInto()) {
 			if (level.getEntity(x + dx, y + dy) != null) {//there's something where we're tryign to move!
@@ -59,55 +65,33 @@ public class MovingState implements EntityState{
 			} else {//cell is unoccupied
 				path.add(new Point(x + dx, y + dy));
 			}
-			boolean searching = !init.hasFriction();//only continue to search if there's no friction on the destination tile.
-			int i = 2;
-			while (searching) {
-				int newDx = dx * i;
-				int newDy = dy * i;
-				Tile t = p.getLevel().getTile(x + newDx, y + newDy);
-				if (t.canMoveInto()) {					
-					if (level.getEntity(x + newDx, y + newDy) != null) {//there's something where we're tryign to move!
-						if (level.getTile(x + newDx + dx, y + newDy + dy).canMoveInto() && level.getEntity(x + newDx + dx, y + newDy + dy) == null) {//next spot is empty
-							level.getEntity(x + newDx, y + newDy).setState(new MovingState(level.getEntity(x + newDx, y + newDy), dir));
-							path.add(new Point(x + newDx, y + newDy));
-						}
-					} else {//cell is unoccupied
-						path.add(new Point(x + newDx, y + newDy));
-					}				
-				} else {
-					searching = false;
-				}
-				searching &= !t.hasFriction(); //only continue if we can move into it and there is no friction				
-				i++;
-			}
+			
+			
 			if (!path.isEmpty()) {
 				Point point = path.remove();
 				p.getLevel().moveEntity(p.getX(), p.getY(), point.x, point.y);
 			}
-			
-		}
-		
-		
+		}*/
 	}
 	
 	@Override
-	public void update() {
-		if (path.isEmpty()) {
+	public void update() {  //TODO: have moving state move the graphic of the character slowly.
+		if (path == null) { //no path was found - we couldn't move!
 			p.setState(new IdleState(p));
+		} else if (path.isEmpty()) {
+			p.setState(new IdleState(p));
+			p.setInTurn(false); // We have complted moving, and are now done with our turn!
 		} else {
-			long currentTime = System.currentTimeMillis();
-			if (currentTime - enterTime >= DELAY) {//time to move again!
-				enterTime = currentTime;
-				Point pt = path.remove();
-				p.getLevel().moveEntity(p.getX(), p.getY(), pt.x, pt.y);
-			}
+			Point pt = path.remove();
+			p.move(pt.x, pt.y);
+			
 		}
 		
 	}
 
 	@Override
-	public void paint(Graphics g, BufferedImage img) {
-		p.paint(g, img);
+	public void paint(Graphics g, BufferedImage img, Camera c) {
+		p.paint(g, img, c);
 		
 	}
 

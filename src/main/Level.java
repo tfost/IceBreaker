@@ -8,18 +8,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import display.Camera;
 import entities.MovableStone;
 import entities.Player;
+import entities.Slime;
+import generators.WorldBuilder;
 import interfaces.Direction;
 import interfaces.Entity;
 import tiles.Floor;
-import tiles.PressOnlyOnceButton;
-import tiles.SlipperyPressOnlyOnceButton;
 import tiles.Tile;
-import tiles.UnbreakingIce;
 import tiles.Wall;
-import tiles.WeightedButton;
-import tiles.Button;
 
 //stores data containing information about the level.
 public class Level {
@@ -61,15 +59,15 @@ public class Level {
 	};
 	
 	public static int[][] testLevel4 = {
-			{1,3,1,1,1,1,1,1,1,1,1,1,1},
+			{1,1,1,1,1,1,1,1,1,1,1,1,1},
 			{1,0,0,0,0,0,0,0,0,0,0,0,1},
 			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,5,0,7,0,0,0,1},
-			{1,0,0,0,0,0,5,0,0,0,0,0,1},
-			{1,0,0,0,0,0,5,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,8,0,1},
 			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,2,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,2,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,1},
 			{1,1,1,1,1,1,1,1,1,1,1,1,1}
 	};
 	
@@ -91,7 +89,6 @@ public class Level {
 	private Point startingPoint;
 	private int width;
 	private int height;
-	private Set<Button> buttons;
 	private Entity[][] entities; //stores the different entities on the board
 	private Set<Entity> nonPlayerEntities;
 	
@@ -105,9 +102,8 @@ public class Level {
 	/**
 	 * creates a new level based off of a given multidimensional array of tile data.
 	 * @param data
-	 */
+	 */	
 	public Level(int[][] data) {
-		this.buttons = new HashSet<>();
 		this.nonPlayerEntities = new HashSet<>();
 		this.data = new Tile[data.length][data[0].length];
 		this.entities = new Entity[data.length][data[0].length];
@@ -118,29 +114,46 @@ public class Level {
 					t = new Floor();
 					this.startingPoint = new Point(j, i);
 					this.entities[i][j] = new Player(j, i, this);
+					//DEBUG: ENTITY TESTING
+					Entity e = new Slime(j - 3, i - 3, this);
+					this.nonPlayerEntities.add(e);
+					this.entities[i - 3][j - 3] = e;
+					//End Debug;
 				} 
+				else if (data[i][j] == 0 ) {
+					t = new Floor();
+				}
 				else if (data[i][j] == 1) {
 					t = new Wall();
 				} 
-				else if (data[i][j] == 3) {
-					t = new PressOnlyOnceButton();
-					this.buttons.add((Button) t);
+				else {
+					t = new Tile();
 				}
-				else if (data[i][j] == 5) {
-					t = new UnbreakingIce();
-				}
-				else if (data[i][j] == 6) {
-					t = new SlipperyPressOnlyOnceButton();
-					this.buttons.add((Button) t);
-				} else if (data[i][j] == 7) {
+				this.data[i][j] = t;
+			}
+		}
+		this.width = this.data.length;
+		this.height = this.data[0].length;
+	}
+	
+	public Level(char[][] data) {
+		this.nonPlayerEntities = new HashSet<>();
+		this.data = new Tile[data.length][data[0].length];
+		this.entities = new Entity[data.length][data[0].length];
+		for (int i = 0; i < this.data.length; i++) {
+			for (int j = 0; j < this.data[0].length; j++) {
+				Tile t;
+				if (data[i][j] == 'E') { //special instance where it's the starting point.
 					t = new Floor();
-					MovableStone stone = new MovableStone(j,i,this);
-					this.entities[i][j] = stone;
-					nonPlayerEntities.add(stone);
-				} else if (data[i][j] == 8) {
-					t = new WeightedButton();
-					this.buttons.add((Button) t);
+					this.startingPoint = new Point(j, i);
+					this.entities[i][j] = new Player(j, i, this);
+				} 
+				else if (data[i][j] == 'X') {
+					t = new Tile();
 				}
+				else if (data[i][j] == '@') {
+					t = new Wall();
+				} 
 				else {
 					t = new Floor();
 				}
@@ -151,7 +164,7 @@ public class Level {
 		this.height = this.data[0].length;
 	}
 	
-	public Tile getTileInDirection(Player p, Direction dir) {
+	public Tile getTileInDirection(Entity p, Direction dir) {
 		int newX = p.getX();
 		int newY = p.getY();		
 		switch (dir) {		
@@ -170,6 +183,26 @@ public class Level {
 		}
 		Tile t = this.getTile(newX, newY);
 		return t;
+	}
+	
+	public Point getTileCoordsInDirection(Entity p, Direction dir) {
+		int newX = p.getX();
+		int newY = p.getY();		
+		switch (dir) {		
+			case UP:
+				newY--;
+				break;
+			case DOWN:
+				newY++;
+				break;
+			case LEFT:
+				newX--;
+				break;
+			case RIGHT:
+				newX++;
+				break;
+		}
+		return new Point(newX, newY);
 	}
 	
 	
@@ -201,12 +234,12 @@ public class Level {
 	}
 	
 	//paint each tile to the screen. 
-	public void paint(Graphics g, BufferedImage img) {
+	public void paint(Graphics g, BufferedImage img, Camera c) {
 		for (int i = 0; i < this.data.length; i++) {
 			for (int j = 0; j < this.data[0].length; j++) {
 				Tile t = this.data[i][j];
 				//g.setColor(t.getColor());
-				t.paint(g, img, j, i);
+				t.paint(g, img, j, i, c);
 				//g.fillRect(j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 				
 			}
@@ -214,39 +247,25 @@ public class Level {
 		for (int i = 0; i < this.entities.length; i++) {
 			for (int j = 0; j < this.entities[0].length; j++) {
 				if (this.entities[i][j] != null) {
-					this.entities[i][j].paint(g, img);
+					this.entities[i][j].paint(g, img, c);
 				}
 				
 			}
 		}
 			
-		if (levelValid()) {
-			g.setColor(Color.red);
-			g.drawString("Level Complete!", 200, 300);
-		}
+		
+	}
+	
+	public boolean canMoveInto(int x, int y) {
+		return this.data[y][x].canMoveInto() && this.entities[y][x] == null;
 	}
 	
 	//moves an entity from one spot to another.
 	public void moveEntity(int x, int y, int destx, int desty) {
 		Entity entity = this.getEntity(x, y);
-		entity.move(destx, desty);
+		//entity.move(destx, desty);
 		this.entities[y][x] = null;
 		this.entities[desty][destx] = entity;
-	}
-	
-	public boolean levelValid() {
-		for (Button b : this.buttons) {
-			if (!b.isValid()) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	public void reset() {
-		for (Button b : this.buttons) {
-			b.reset();
-		}
 	}
 	
 	public Set<Entity> getNonPlayerEntities() {
