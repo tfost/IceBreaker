@@ -7,11 +7,14 @@ import interfaces.Direction;
 import interfaces.Entity;
 import main.Level;
 
-public class TestBehavior extends AIBehavior{
-	Random r;
+public class TestBehavior implements AIBehavior{
+	private Random r;
+	private Level l;
+	private Entity entity;
 	
 	public TestBehavior(Level l, Entity e) {
-		super(l, e);
+		this.l = l;
+		this.entity = e;
 		r = new Random();
 		// TODO Auto-generated constructor stub
 	}

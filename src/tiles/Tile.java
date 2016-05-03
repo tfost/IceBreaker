@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import display.Camera;
+import interfaces.Entity;
 import main.Level;
 
 public class Tile {
@@ -25,7 +26,6 @@ public class Tile {
 	}
 	
 	
-	
 	protected void setImgX(int imgX) {
 		this.imgX = imgX;
 	}
@@ -34,10 +34,10 @@ public class Tile {
 		this.imgY = imgY;
 	}
 	
-	//default paint method.
-	//takes a graphics object, and an image containing the tileset.
-	//also takes x/y coordinates of where the tile's top left corner shoudl be drawn.
-	//uses default tile_size from Level class
+	// default paint method.
+	// takes a graphics object, and an image containing the tileset.
+	// also takes x/y coordinates of where the tile's top left corner shoudl be drawn.
+	// uses default tile_size from Level class
 	public void paint(Graphics g, BufferedImage img, int x, int y ,Camera c) {
 		int xTopLeft = c.translateXToScreen(x * Level.TILE_SIZE);
 		int yTopLeft = c.translateYToScreen(y * Level.TILE_SIZE);
@@ -45,8 +45,9 @@ public class Tile {
 		g.drawImage(img, xTopLeft, yTopLeft, xTopLeft + Level.TILE_SIZE, yTopLeft + Level.TILE_SIZE , imgX, imgY, imgX + 16, imgY + 16, null);
 	}
 	
-	//Interactive Tile methods.
-	public void onMoveInto() {} //to be implemented by Button but maintain functionality here.
+	// Interactive Tile methods.
+	// Called 
+	public void onMoveInto(Entity e) {} 
 	public void onExit() {}
 
 }

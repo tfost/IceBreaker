@@ -26,7 +26,7 @@ public class AttackingState implements EntityState{
 
 	@Override
 	public void paint(Graphics g, BufferedImage img, Camera c) {
-		p.paint(g, img, c);
+		p.defaultPaint(g, img, c);
 		
 	}
 

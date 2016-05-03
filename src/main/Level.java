@@ -16,6 +16,7 @@ import generators.WorldBuilder;
 import interfaces.Direction;
 import interfaces.Entity;
 import tiles.Floor;
+import tiles.Staircase;
 import tiles.Tile;
 import tiles.Wall;
 
@@ -84,7 +85,7 @@ public class Level {
 			{1,1,1,1,1,1,1}
 	};
 	
-	public static final int TILE_SIZE = 32;	
+	public static final int TILE_SIZE = 64;	
 	private Tile[][] data;
 	private Point startingPoint;
 	private int width;
@@ -137,6 +138,10 @@ public class Level {
 	}
 	
 	public Level(char[][] data) {
+		this(data, null);
+	}
+	
+	public Level(char[][] data, Player player) {
 		this.nonPlayerEntities = new HashSet<>();
 		this.data = new Tile[data.length][data[0].length];
 		this.entities = new Entity[data.length][data[0].length];
@@ -146,10 +151,19 @@ public class Level {
 				if (data[i][j] == 'E') { //special instance where it's the starting point.
 					t = new Floor();
 					this.startingPoint = new Point(j, i);
-					this.entities[i][j] = new Player(j, i, this);
+					if (player == null) {
+						this.entities[i][j] = new Player(j, i, this);
+					} else {
+						this.entities[i][j] = player;
+					}
+					//DEBUG: ENTITY TESTING
+					Entity e = new Slime(j - 3, i - 3, this);
+					this.nonPlayerEntities.add(e);
+					this.entities[i - 3][j - 3] = e;
+					//End Debug;
 				} 
 				else if (data[i][j] == 'X') {
-					t = new Tile();
+					t = new Staircase();
 				}
 				else if (data[i][j] == '@') {
 					t = new Wall();
@@ -163,7 +177,7 @@ public class Level {
 		this.width = this.data.length;
 		this.height = this.data[0].length;
 	}
-	
+
 	public Tile getTileInDirection(Entity p, Direction dir) {
 		int newX = p.getX();
 		int newY = p.getY();		
@@ -247,13 +261,14 @@ public class Level {
 		for (int i = 0; i < this.entities.length; i++) {
 			for (int j = 0; j < this.entities[0].length; j++) {
 				if (this.entities[i][j] != null) {
-					this.entities[i][j].paint(g, img, c);
-				}
-				
+					this.entities[i][j].defaultPaint(g, img, c);
+				}				
 			}
-		}
-			
-		
+		}		
+	}
+	
+	public void removeEntity(int x, int y) {
+		this.entities[y][x] = null;
 	}
 	
 	public boolean canMoveInto(int x, int y) {
@@ -263,7 +278,6 @@ public class Level {
 	//moves an entity from one spot to another.
 	public void moveEntity(int x, int y, int destx, int desty) {
 		Entity entity = this.getEntity(x, y);
-		//entity.move(destx, desty);
 		this.entities[y][x] = null;
 		this.entities[desty][destx] = entity;
 	}

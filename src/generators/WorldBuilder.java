@@ -63,17 +63,19 @@ public class WorldBuilder {
 	}
 	
 	
-	public void populate() {		
+	public void populate() {	
+		System.out.println("Placing Rooms");
 		List<Point> points = this.placeRooms();	//place random non-overlapping rooms
-
+		System.out.println("Carving Mazes");
 		this.placeMazes();	//fill in remaining solid regions with mazes
+		System.out.println("Connecting mazes to rooms");
 		this.connectMaze();//connect mazes with rooms, with chances for extra connections.
+		System.out.println("Removing Dead Ends from Dungeon");
 		this.sparsify();//remove dead ends from the dungeon.
-		System.out.println(this);
-
+		System.out.println("Placing starting point and exit");
 		this.placeEntranceAndExit(points);
-		System.out.println(this);
-
+		//System.out.println(this);
+		System.out.println("Level Generated!");
 
 	}	
 	
@@ -200,18 +202,32 @@ public class WorldBuilder {
 				
 			}
 		}
-		System.out.println(roomConnections.keySet());
+		//System.out.println(roomConnections.keySet());
 		for (Integer i: roomConnections.keySet()) {
 			List<Point> list = roomConnections.get(i);
 			int idx = rand.nextInt(list.size());
 			Point removed = list.get(idx);
 			world[removed.y][removed.x].c = ' ';
-			while (isDeadEnd(removed)) {
+			int attemptsLeft = list.size() * 10;
+			//randomly choose an edge to be a connector as long as its an edge.
+			while (isDeadEnd(removed) && attemptsLeft > 0) {
 				world[removed.y][removed.x].c = '@';
 				idx = rand.nextInt(list.size());
 				removed = list.get(idx);
 				world[removed.y][removed.x].c = ' ';
-
+				attemptsLeft--;
+			}
+			//Randomly choosing didn't find a dead-end. Check every element now.
+			if (attemptsLeft == 0 && isDeadEnd(removed)) {
+				for (int j= 0; j < list.size(); j++) {
+					if (!isDeadEnd(removed)) {
+						break;
+					}
+					world[removed.y][removed.x].c = '@';
+					removed = list.get(j);
+					world[removed.y][removed.x].c = ' ';
+				}
+				
 			}
 			list.remove(idx);
 			for (int j = 0; j < list.size(); j++) {

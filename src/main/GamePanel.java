@@ -60,7 +60,7 @@ public class GamePanel extends JPanel{
 			if ((game.stateStack.peek().inState())) {
 				game.stateStack.peek().update();
 				game.repaint();
-				Thread.sleep(15);
+				Thread.sleep(25);
 			} else {
 				if (game.stateStack.peek().nextState() == null) {
 					game.stateStack.pop(); // done with this state. do the one beneath it now.

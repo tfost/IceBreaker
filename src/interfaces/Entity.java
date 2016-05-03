@@ -75,7 +75,7 @@ public class Entity {
 		l.moveEntity(this.x, this.y, x, y);
 		this.x = x;
 		this.y = y;
-		l.getTile(x, y).onMoveInto();
+		l.getTile(x, y).onMoveInto(this);
 	}
 	
 	public Level getLevel() {
@@ -93,6 +93,20 @@ public class Entity {
 		g.drawImage(img, xTopLeft, yTopLeft, xTopLeft + Level.TILE_SIZE, yTopLeft + Level.TILE_SIZE , imgX, imgY, imgX + 16, imgY + 16, null);
 		g.setColor(Color.white);
 		g.drawString(this.hp + "/" + this.maxHp, xTopLeft, yTopLeft);
+	}
+	
+	public void defaultPaint(Graphics g, BufferedImage img, Camera c) {	}
+	
+	protected void setLevel(Level l) {
+		this.l = l;
+	}
+	
+	protected void setX(int x) {
+		this.x = x;
+	}
+	
+	protected void setY(int y) {
+		this.y = y;
 	}
 	
 	public void onAttack() {}
@@ -127,6 +141,14 @@ public class Entity {
 		this.imgY = imgY;
 	}
 	
+	public int getHP() {
+		return this.hp;
+	}
+	
+	public boolean isPlayer() {
+		return false;
+	}
+	
 	public static int calculateDamage(Entity attacker, Entity defender) {
 		int dmg = attacker.atk - defender.def;
 		if (dmg <= 0) {
@@ -135,6 +157,8 @@ public class Entity {
 			return dmg;
 		}
 	}
+
+	
 
 }
 
