@@ -92,6 +92,7 @@ public class Level {
 	private int height;
 	private Entity[][] entities; //stores the different entities on the board
 	private Set<Entity> nonPlayerEntities;
+	private Player player;
 	
 	/**
 	 * constructs a new level based off the default test level.
@@ -153,21 +154,21 @@ public class Level {
 					this.startingPoint = new Point(j, i);
 					if (player == null) {
 						this.entities[i][j] = new Player(j, i, this);
+						this.player = (Player) this.entities[i][j];
 					} else {
 						this.entities[i][j] = player;
 					}
-					//DEBUG: ENTITY TESTING
-					Entity e = new Slime(j - 3, i - 3, this);
-					this.nonPlayerEntities.add(e);
-					this.entities[i - 3][j - 3] = e;
-					//End Debug;
 				} 
 				else if (data[i][j] == 'X') {
 					t = new Staircase();
 				}
 				else if (data[i][j] == '@') {
 					t = new Wall();
-				} 
+				} else if (data[i][j] == 'M') {  // monster spawning tile
+					t = new Floor();
+					this.entities[i][j] = new Slime(j, i, this);
+					this.nonPlayerEntities.add(this.entities[i][j]);
+				}
 				else {
 					t = new Floor();
 				}
@@ -284,6 +285,10 @@ public class Level {
 	
 	public Set<Entity> getNonPlayerEntities() {
 		return this.nonPlayerEntities;
+	}
+	
+	public Player getPlayer() {
+		return this.player;
 	}
 	
 	public void printEntities() {

@@ -19,7 +19,7 @@ public class WorldBuilder {
 	private int width = 51;
 	private int height = 51;
 	private Random rand;
-	
+	private int SPAWNCHANCE = 1;
 	
 	public static final int NUM_ATTEMPTS = 20000;
 	
@@ -74,10 +74,33 @@ public class WorldBuilder {
 		this.sparsify();//remove dead ends from the dungeon.
 		System.out.println("Placing starting point and exit");
 		this.placeEntranceAndExit(points);
-		//System.out.println(this);
+		System.out.println("Creating Monster Spawn Points");
+		this.placeSpawnPoints();
 		System.out.println("Level Generated!");
 
 	}	
+	
+	private void placeSpawnPoints() {
+		List<BoardObject> openSpots = getEmptyCells();
+		for (BoardObject b : openSpots) {
+			int chance = rand.nextInt(100);
+			if (chance < SPAWNCHANCE) {
+				b.c = 'M'; //monster!
+			}
+		}
+	}
+	
+	private List<BoardObject> getEmptyCells() {
+		List<BoardObject> lst = new ArrayList<>();
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (world[y][x].c == ' ') {
+					lst.add(world[y][x]);
+				}
+			}
+		}
+		return lst;
+	}
 	
 	private void placeEntranceAndExit(List<Point> points) {
 		//entrance = "E" exit = "X"
