@@ -38,7 +38,6 @@ public class IdleState implements EntityState{
 		if (p.getLevel().getEntity(pt.x, pt.y) == null) {
 			p.setState(new MovingState(p, dir));
 		} else {  // There is an entity there! Attack it!
-			//System.out.println("Attacking something!");
 			Entity e = p.getLevel().getEntity(pt.x, pt.y);
 			p.setState(new AttackingState((Player) p, e));
 		}
