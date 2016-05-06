@@ -23,7 +23,6 @@ public class IdleState implements EntityState{
 	
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 		
 	}
 
