@@ -19,8 +19,8 @@ public class WorldBuilder {
 	private int width = 51;
 	private int height = 51;
 	private Random rand;
-	private int SPAWNCHANCE = 1;
-	
+	private int SPAWNCHANCE = 5;
+	private Point playerLoc;
 	public static final int NUM_ATTEMPTS = 20000;
 	
 	public WorldBuilder() {
@@ -31,7 +31,7 @@ public class WorldBuilder {
 				world[y][x] = new BoardObject('@');
 			}
 		}
-		
+		this.playerLoc = null;
 	}
 	/*
 	 * H >> 1 2 3 4 5 6
@@ -43,10 +43,10 @@ public class WorldBuilder {
 	 * 
 	 */
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		WorldBuilder builder = new WorldBuilder();
 		builder.populate();
-	}
+	}*/
 	
 	
 	public String toString() {
@@ -76,14 +76,29 @@ public class WorldBuilder {
 		this.placeEntranceAndExit(points);
 		System.out.println("Creating Monster Spawn Points");
 		this.placeSpawnPoints();
+		System.out.println("Removing impossible rooms");
+		this.verifyDungeon();
+		
 		System.out.println("Level Generated!");
 
 	}	
 	
+	//Ensures that all tiles in the maze can be reached by the player. If not, 
+	//removes such tiles from the world by making them walls.
+	private void verifyDungeon() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (world[y][x].c != '@' && !pathExists(this.playerLoc, new Point(x, y))) {
+					world[y][x].c = '@';
+				}
+			}
+		}
+	}
+	
 	private void placeSpawnPoints() {
 		List<BoardObject> openSpots = getEmptyCells();
 		for (BoardObject b : openSpots) {
-			int chance = rand.nextInt(100);
+			int chance = rand.nextInt(1000);
 			if (chance < SPAWNCHANCE) {
 				b.c = 'M'; //monster!
 			}
@@ -118,6 +133,7 @@ public class WorldBuilder {
 			dest = points.get(p2);
 		}
 		world[points.get(p1).y][points.get(p1).x].c = 'E';
+		this.playerLoc = points.get(p1);
 		world[points.get(p2).y][points.get(p2).x].c = 'X';
 
 	}
@@ -298,7 +314,7 @@ public class WorldBuilder {
 		}
 	}
 	
-	//generates a perfect maze, by creating a minimally spanning tree
+	//generates a perfect maze, by creating a minimally spanning tree using Prim's algorithm.
 	private void generateMaze(Point p, Point p2) {
 		if (inBounds(p) && !world[p.y][p.x].visited) {
 			if (!nextToRoom(p) && !adjacentToMoreThanOne(p) && !createsLoop(p, p2)) {			
@@ -342,8 +358,6 @@ public class WorldBuilder {
 				world[p.y - 1][p.x - 1].roomNum != -1 ||
 				world[p.y + 1][p.x].roomNum != -1 ||
 				world[p.y - 1][p.x].roomNum != -1;
-
-	
 	}
 	
 	//returns a list containing all values that are considered valid tiles in a room.

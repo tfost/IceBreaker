@@ -10,7 +10,7 @@ public class Slime extends Entity{
 	
 	public Slime(int x, int y, Level l) {
 		super(x, y, l);
-		this.behavior = new TestBehavior(l, this);
+		this.behavior = new HunterBehavior(this, l);
 		this.imgX = 0;
 		this.imgY = 48;
 		this.maxHp = this.hp = 10;

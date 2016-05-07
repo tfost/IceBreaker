@@ -22,68 +22,6 @@ import tiles.Wall;
 
 //stores data containing information about the level.
 public class Level {
-	/*
-	 * 1 = wall. Player can't walk through here.
-	 * 0 = ground
-	 * 2 = starting point. character starts out here.
-	 * 3 = button. If pushed more than once, door won't open.
-	 * 4 = door. Can't go through until all buttons are in a valid state.
-	 * 5 = ice
-	 */
-	public static int[][] testLevel = {
-			{1, 1, 1, 1, 1, 1},
-			{1, 2, 0, 3, 0, 4},
-			{1, 1, 1, 1, 1, 1}
-	};
-	
-	public static int[][] testLevel2 = {
-			{1,3,1,1,1,1,1,1,1,1,1,1,1},
-			{1,3,1,1,1,1,1,1,1,1,1,1,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,1,1,1,1,0,1,1,0,0,1},
-			{1,0,1,0,3,0,0,3,0,3,1,0,1},
-			{1,0,1,0,1,1,1,3,1,3,1,0,1},
-			{1,0,1,0,0,3,0,3,3,3,1,0,1},
-			{1,0,0,0,3,1,1,3,0,1,0,0,1},
-			{1,2,0,0,3,3,3,3,0,0,0,0,1},
-			{1,1,1,1,1,1,1,1,1,1,1,1,1}
-	};
-	
-	public static int[][] testLevel3 = { //based off sootopolis 3rd level
-			{1,1,1,1,1,3,1,1,1,1,1},
-			{3,3,1,3,3,3,3,3,3,3,3},
-			{3,3,3,3,3,3,1,3,3,1,3},
-			{3,1,3,3,1,3,3,3,3,3,3},
-			{3,3,3,3,3,3,3,3,1,3,3},
-			{1,1,1,1,1,2,1,1,1,1,1}
-			
-	};
-	
-	public static int[][] testLevel4 = {
-			{1,1,1,1,1,1,1,1,1,1,1,1,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,2,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,1,1,1,1,1,1,1,1,1,1,1,1}
-	};
-	
-	public static int[][] testLevel5 = {
-			{1,1,1,3,1,1,1},
-			{1,1,0,0,0,1,1},
-			{1,7,7,0,7,7,1},
-			{1,0,7,7,7,0,1},
-			{1,7,0,0,0,7,1},
-			{1,0,7,7,7,0,1},
-			{1,0,0,0,0,0,1},
-			{1,0,0,0,0,0,1},
-			{1,0,0,2,0,0,1},
-			{1,1,1,1,1,1,1}
-	};
 	
 	public static final int TILE_SIZE = 64;	
 	private Tile[][] data;
@@ -97,55 +35,26 @@ public class Level {
 	/**
 	 * constructs a new level based off the default test level.
 	 */
-	public Level() {
+	/*public Level() {
 		this(testLevel4);
-	}
+	}*/
 	
-	/**
-	 * creates a new level based off of a given multidimensional array of tile data.
-	 * @param data
-	 */	
-	public Level(int[][] data) {
-		this.nonPlayerEntities = new HashSet<>();
-		this.data = new Tile[data.length][data[0].length];
-		this.entities = new Entity[data.length][data[0].length];
-		for (int i = 0; i < this.data.length; i++) {
-			for (int j = 0; j < this.data[0].length; j++) {
-				Tile t;
-				if (data[i][j] == 2) { //special instance where it's the starting point.
-					t = new Floor();
-					this.startingPoint = new Point(j, i);
-					this.entities[i][j] = new Player(j, i, this);
-					//DEBUG: ENTITY TESTING
-					Entity e = new Slime(j - 3, i - 3, this);
-					this.nonPlayerEntities.add(e);
-					this.entities[i - 3][j - 3] = e;
-					//End Debug;
-				} 
-				else if (data[i][j] == 0 ) {
-					t = new Floor();
-				}
-				else if (data[i][j] == 1) {
-					t = new Wall();
-				} 
-				else {
-					t = new Tile();
-				}
-				this.data[i][j] = t;
-			}
-		}
-		this.width = this.data.length;
-		this.height = this.data[0].length;
-	}
 	
 	public Level(char[][] data) {
 		this(data, null);
 	}
 	
+	/**
+	 * Constructs a new Level using an array of data and a given player.
+	 * @param data		A character array of data.
+	 * @param player	A Player from a previous level. If player is null, one will be created.
+	 * 					Either way, the player will be reinitialized to be at the level's starting coords.
+	 */
 	public Level(char[][] data, Player player) {
 		this.nonPlayerEntities = new HashSet<>();
 		this.data = new Tile[data.length][data[0].length];
 		this.entities = new Entity[data.length][data[0].length];
+		int monsSpawned = 0;
 		for (int i = 0; i < this.data.length; i++) {
 			for (int j = 0; j < this.data[0].length; j++) {
 				Tile t;
@@ -168,6 +77,7 @@ public class Level {
 					t = new Floor();
 					this.entities[i][j] = new Slime(j, i, this);
 					this.nonPlayerEntities.add(this.entities[i][j]);
+					monsSpawned++;
 				}
 				else {
 					t = new Floor();
@@ -175,6 +85,7 @@ public class Level {
 				this.data[i][j] = t;
 			}
 		}
+		System.out.println(monsSpawned + " Monsters Spawned");
 		this.width = this.data.length;
 		this.height = this.data[0].length;
 	}
