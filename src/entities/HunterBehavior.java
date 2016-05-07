@@ -22,7 +22,7 @@ public class HunterBehavior implements AIBehavior {
 	
 	private Entity e;
 	private Level l;
-	
+		
 	public HunterBehavior(Entity e, Level l) {
 		this.e = e;
 		this.l = l;
