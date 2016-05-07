@@ -138,10 +138,11 @@ public class GS_LevelState extends GameState{
 	@Override
 	public void paint(Graphics g) {
 		this.level.paint(g, img, c);	
-		this.player.paint(g, img, c);
 		for (Entity e : this.nonPlayerEntities) {
 			e.paint(g, img, c);
 		}
+		this.player.paint(g, img, c);
+		
 	}
 
 	@Override

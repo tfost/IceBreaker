@@ -77,9 +77,10 @@ public class Player extends Entity {
 	}
 
 	public void defaultPaint(Graphics g, BufferedImage img, Camera c) {
+		int dirOffset = this.getDirectionOffset();
 		g.drawImage(img, GamePanel.WIDTH / 2 - Level.TILE_SIZE / 2, GamePanel.HEIGHT / 2 - Level.TILE_SIZE / 2, 
 					GamePanel.WIDTH / 2 + Level.TILE_SIZE / 2, GamePanel.HEIGHT / 2 + Level.TILE_SIZE / 2, 
-					imgX, imgY, imgX + 16, imgY + 16, null);
+					imgX, imgY + dirOffset, imgX + 16, imgY + 16 + dirOffset, null);
 		g.setColor(Color.white);
 		g.drawString(this.hp + "/" + this.maxHp, GamePanel.WIDTH / 2 - Level.TILE_SIZE / 2, GamePanel.HEIGHT / 2 - Level.TILE_SIZE / 2);
 

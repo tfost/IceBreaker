@@ -53,6 +53,9 @@ public class IdleState implements EntityState{
 			determineMovementAction(Direction.RIGHT);
 		}
 		
+		if (input.keyDownOnce(KeyEvent.VK_E)) {
+			this.p.setState(new InInventoryState((Player) this. p));
+		}
 		
 	}
 	

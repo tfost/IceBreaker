@@ -22,8 +22,11 @@ public class Entity {
 	protected boolean inturn;
 	protected Level l;
 	protected EntityState state;
+	
+	// Graphics Information : how the entity should be drawn to the screen.
 	protected int imgX;
 	protected int imgY;
+	protected Direction facing;
 	
 	//Stat information
 	protected int maxHp;
@@ -41,6 +44,7 @@ public class Entity {
 		this.state = new IdleState(this);
 		this.inturn = false;
 		this.name = "DEFAULT";
+		this.facing = Direction.DOWN;
 	}
 	
 	public int getX() {
@@ -66,17 +70,32 @@ public class Entity {
 	}
 	
 	//TODO : move in a way that takes time, instead of instantaneously moving
-	//which will allow frictionless tiles.
+	//which will allow frictionless tiles. The caller is responsible for making
+	//sure the place being moved to can be moved into, otherwise raises an exception.
 	public void move(int x, int y) {
 		if (!l.getTile(x, y).canMoveInto()) {
-			throw new IllegalStateException("It is forbidden to move into tile " + x + ", " + y);
+			throw new IllegalStateException("Cannot move into " + x + ", " + y);
 		}
+		this.facing = getDirectionOfMovement(x - this.x, y - this.y);
 		l.getTile(this.x, this.y).onExit();
 		l.moveEntity(this.x, this.y, x, y);
 		this.x = x;
 		this.y = y;
 		l.getTile(x, y).onMoveInto(this);
 	}
+	
+	public Direction getDirectionOfMovement(int dx, int dy) {
+		if (dx > 0) {
+			return Direction.RIGHT;
+		} else if (dx < 0) {
+			return Direction.LEFT;
+		} else if (dy < 0) {
+			return Direction.UP;
+		} else {
+			return Direction.DOWN;
+		}
+	}
+	
 	
 	public Level getLevel() {
 		return l;
@@ -90,9 +109,30 @@ public class Entity {
 		int xTopLeft = c.translateXToScreen(x * Level.TILE_SIZE);
 		int yTopLeft = c.translateYToScreen(y * Level.TILE_SIZE);
 		//16 = width of images in picture file. TODO : change to constant.
-		g.drawImage(img, xTopLeft, yTopLeft, xTopLeft + Level.TILE_SIZE, yTopLeft + Level.TILE_SIZE , imgX, imgY, imgX + 16, imgY + 16, null);
+		int dirOffset = this.getDirectionOffset();
+		g.drawImage(img, xTopLeft, yTopLeft, xTopLeft + Level.TILE_SIZE, yTopLeft + Level.TILE_SIZE, 
+									imgX, imgY + dirOffset, imgX + 16, imgY + 16 + dirOffset, null);
 		g.setColor(Color.white);
 		g.drawString(this.hp + "/" + this.maxHp, xTopLeft, yTopLeft);
+	}
+	
+	protected int getDirectionOffset() {
+		int dir = 0;
+		switch(this.facing) {
+			case UP:
+				dir = 3;
+				break;
+			case DOWN:
+				dir =  0;
+				break;
+			case LEFT:
+				dir = 1;
+				break;
+			case RIGHT:
+				dir = 2;	
+				break;
+		}
+		return dir * 16; // size of tiles on img.		
 	}
 	
 	public void defaultPaint(Graphics g, BufferedImage img, Camera c) {	}

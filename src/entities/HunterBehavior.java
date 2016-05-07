@@ -31,6 +31,9 @@ public class HunterBehavior implements AIBehavior {
 	@Override
 	public void determineAction(int turnnum) {
 		Player p = this.l.getPlayer();
+		if (p == null) {
+			throw new IllegalStateException("Player is null");
+		}
 		Stack<Point> path = pathfindToPoint(p.getX(), p.getY(), e.getX(), e.getY());
 		if (path == null) {
 			throw new IllegalStateException("No Path Generated: my location is " + this.e.getX() + ", " + this.e.getY());

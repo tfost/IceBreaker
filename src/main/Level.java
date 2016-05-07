@@ -66,6 +66,7 @@ public class Level {
 						this.player = (Player) this.entities[i][j];
 					} else {
 						this.entities[i][j] = player;
+						this.player = player;
 					}
 				} 
 				else if (data[i][j] == 'X') {
