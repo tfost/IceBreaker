@@ -55,6 +55,11 @@ public class Entity {
 		return this.y;
 	}
 	
+	// Soluble entities take damage from potions, no matter what!
+	public boolean isSoluble() {
+		return false;
+	}
+	
 	public void handleInput(KeyboardInput input) {
 		//state.handleInput(input);//default does nothing.
 	}
@@ -96,9 +101,21 @@ public class Entity {
 		}
 	}
 	
+	public String getName() {
+		return this.name;
+	}
 	
 	public Level getLevel() {
 		return l;
+	}
+	
+	public void setHP(int hp) {
+		this.hp = hp;
+		if (this.hp > this.maxHp) {
+			this.hp = this.maxHp;
+		} else if (this.hp < 0) {
+			this.hp = 0;
+		}			 
 	}
 	
 	//default paint method.
@@ -116,6 +133,7 @@ public class Entity {
 		g.drawString(this.hp + "/" + this.maxHp, xTopLeft, yTopLeft);
 	}
 	
+	// Returns the vertical offset of the proper image for the player in the game.
 	protected int getDirectionOffset() {
 		int dir = 0;
 		switch(this.facing) {
@@ -133,6 +151,14 @@ public class Entity {
 				break;
 		}
 		return dir * 16; // size of tiles on img.		
+	}
+	
+	public void setDirection(Direction dir) {
+		this.facing = dir;
+	}
+	
+	public Direction getDirection() {
+		return this.facing;
 	}
 	
 	public void defaultPaint(Graphics g, BufferedImage img, Camera c) {	}

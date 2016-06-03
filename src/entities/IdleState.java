@@ -33,13 +33,17 @@ public class IdleState implements EntityState{
 	}
 
 	private void determineMovementAction(Direction dir) {
-		Point pt = p.getLevel().getTileCoordsInDirection(p, dir);
-		if (p.getLevel().getEntity(pt.x, pt.y) == null) {
-			p.setState(new MovingState(p, dir));
-		} else {  // There is an entity there! Attack it!
-			Entity e = p.getLevel().getEntity(pt.x, pt.y);
-			p.setState(new AttackingState((Player) p, e));
-		}
+		/*if (p.getDirection() != dir) { // if not facing direction of button press, make player face that direction. This does not end the turn.
+			p.setDirection(dir);
+		} else {*/
+			Point pt = p.getLevel().getTileCoordsInDirection(p, dir);
+			if (p.getLevel().getEntity(pt.x, pt.y) == null) {
+				p.setState(new MovingState(p, dir));
+			} else {  // There is an entity there! Attack it!
+				Entity e = p.getLevel().getEntity(pt.x, pt.y);
+				p.setState(new AttackingState((Player) p, e));
+			}
+		//}
 	}
 	@Override
 	public void handleInput(KeyboardInput input) {	

@@ -76,8 +76,8 @@ public class WorldBuilder {
 		this.placeEntranceAndExit(points);
 		System.out.println("Creating Monster Spawn Points");
 		this.placeSpawnPoints();
-		System.out.println("Removing impossible rooms");
-		this.verifyDungeon();
+		//System.out.println("Removing impossible rooms");
+		//this.verifyDungeon();
 		
 		System.out.println("Level Generated!");
 
@@ -117,25 +117,38 @@ public class WorldBuilder {
 		return lst;
 	}
 	
+	private List<Point> getEmptyCellLocations() {
+		List<Point> lst = new ArrayList<>();
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (world[y][x].c == ' ') {
+					lst.add(new Point(x, y));
+				}
+			}
+		}
+		return lst;
+	}
+	
 	private void placeEntranceAndExit(List<Point> points) {
 		//entrance = "E" exit = "X"
 		int p1 = rand.nextInt(points.size());
-		int p2 = rand.nextInt(points.size());
-		Point source = points.get(p1);
-		Point dest = points.get(p2);
-		//if they are the same point, or there is no path between the two, give up.
-		while (p1 == p2 || world[source.y][source.x].roomNum == -1 || world[dest.y][dest.x].roomNum == -1 || !pathExists(dest, source)) {
-			//points.remove(p1);
-			//points.remove(p2); //one of these is in an unreachable area, so remove both for safety.
+		Point entrance = points.get(p1);
+		while (world[entrance.y][entrance.x].roomNum == -1) {
 			p1 = rand.nextInt(points.size());
-			p2 = rand.nextInt(points.size());
-			source = points.get(p1);
-			dest = points.get(p2);
+			entrance = points.get(p1);
 		}
-		world[points.get(p1).y][points.get(p1).x].c = 'E';
-		this.playerLoc = points.get(p1);
-		world[points.get(p2).y][points.get(p2).x].c = 'X';
-
+		world[entrance.y][entrance.x].c = 'E';
+		this.playerLoc = entrance;
+		this.verifyDungeon(); // remove all points in the level that are impossible to reach.
+		points = this.getEmptyCellLocations();
+		p1 = rand.nextInt(points.size());
+		Point exit = points.get(p1);
+		while (world[exit.y][exit.x].roomNum == -1 || exit == entrance) {
+			p1 = rand.nextInt(points.size());
+			exit = points.get(p1);
+		}
+		world[exit.y][exit.x].c = 'X';
+		
 	}
 	
 	//this class performs a bfs to see if a path exists between 2 points.
